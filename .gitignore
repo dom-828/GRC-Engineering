@@ -2,3 +2,5 @@
 *.tfstate
 *.tfstate.backup
 tfplan
+
+lab-3-3/terraform/plan.json
