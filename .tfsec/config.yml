@@ -1,0 +1,7 @@
+exclude:
+  - id: aws-s3-encryption-customer-key
+    reason: >
+      Lab 2.5 evidence vault uses SSE-S3 (AES256). KMS CMK encryption
+      is accepted as a future enhancement. Risk accepted for lab environment.
+      Control SC-28 is satisfied by AES256 at rest encryption.
+      Reviewed and approved: dom-828, Lab 4.3.
