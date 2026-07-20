@@ -12,7 +12,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  TF_WORKING_DIR: lab-3-3/terraform
+  TF_WORKING_DIR: lab-2-5
 
 jobs:
   grc-gate:
@@ -60,7 +60,7 @@ jobs:
             FIRST=1
             for ns in compliance.sc28_aws compliance.ac3_aws compliance.cm6_aws compliance.cm6 ; do
               [[ $FIRST -eq 1 ]] && FIRST=0 || printf ","
-              conftest test --policy ../policies --namespace "$ns" --output=json plan.json || true
+              conftest test --policy ../lab-3-4/policies --namespace "$ns" --output=json plan.json || true
             done
             echo "]"
           } > ../evidence/conftest-results.json
