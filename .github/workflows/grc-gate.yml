@@ -12,7 +12,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  TF_WORKING_DIR: lab-3-4
+  TF_WORKING_DIR: lab-3-3/terraform
 
 jobs:
   grc-gate:
