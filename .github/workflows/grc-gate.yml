@@ -12,7 +12,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  TF_WORKING_DIR: lab-2-5
+  TF_WORKING_DIR: lab-2-5/terraform
 
 jobs:
   grc-gate:
@@ -54,19 +54,19 @@ jobs:
         id: conftest
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          mkdir -p ../evidence
+          mkdir -p $GITHUB_WORKSPACE/evidence
           {
             echo "["
             FIRST=1
             for ns in compliance.sc28_aws compliance.ac3_aws compliance.cm6_aws compliance.cm6 ; do
               [[ $FIRST -eq 1 ]] && FIRST=0 || printf ","
-              conftest test --policy ../lab-3-4/policies --namespace "$ns" --output=json plan.json || true
+              conftest test --policy $GITHUB_WORKSPACE/lab-3-4/policies --namespace "$ns" --output=json plan.json || true
             done
             echo "]"
-          } > ../evidence/conftest-results.json
+          } > $GITHUB_WORKSPACE/evidence/conftest-results.json
           python3 -c '
           import json, sys
-          d = json.load(open("../evidence/conftest-results.json"))
+          d = json.load(open("'$GITHUB_WORKSPACE'/evidence/conftest-results.json"))
           fails = sum(len(r.get("failures") or []) for results in d for r in results)
           print(f"conftest failures: {fails}")
           sys.exit(0 if fails == 0 else 1)
@@ -77,10 +77,11 @@ jobs:
         if: always()
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          tfsec . --format sarif --out ../evidence/tfsec.sarif || true
+          mkdir -p $GITHUB_WORKSPACE/evidence
+          tfsec . --format sarif --out $GITHUB_WORKSPACE/evidence/tfsec.sarif || true
           python3 -c '
           import json, sys
-          d = json.load(open("../evidence/tfsec.sarif"))
+          d = json.load(open("'$GITHUB_WORKSPACE'/evidence/tfsec.sarif"))
           high = sum(
               1 for run in d.get("runs", [])
               for r in run.get("results", [])
@@ -93,8 +94,8 @@ jobs:
       - name: Copy plan into evidence
         if: always()
         run: |
-          cp ${{ env.TF_WORKING_DIR }}/plan.json evidence/plan.json
-          cp ${{ env.TF_WORKING_DIR }}/plan.txt  evidence/plan.txt
+          cp ${{ env.TF_WORKING_DIR }}/plan.json $GITHUB_WORKSPACE/evidence/plan.json || true
+          cp ${{ env.TF_WORKING_DIR }}/plan.txt  $GITHUB_WORKSPACE/evidence/plan.txt || true
 
       - name: Upload evidence artifact
         if: always()
